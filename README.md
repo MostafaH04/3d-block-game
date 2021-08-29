@@ -1,3 +1,4 @@
-<h3>"Block Game" *Name to be changed*</h3>
+# "Block Game" *Name to be changed*
 The "Better" Minecraft (python)
-<br>
+<br />
+# Goals
