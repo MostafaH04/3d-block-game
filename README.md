@@ -2,9 +2,10 @@
 The "Better" Minecraft (python)
 <br />
 # Goals <br/>
- - [ ] Render a simple 3d plane using pygame
- - [ ] Render simple objects
- - [ ] Add a player for the user to use
+ - [x] Render a simple 3d plane using pygame
+ - [x] Render simple objects
+ - [x] Add a player for the user to use
+ - [ ] Optimize Rendering
  - [ ] Add player mechanics
  - [ ] Create a world for the player to interact with
  - [ ] Implement a UI
