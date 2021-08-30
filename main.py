@@ -21,8 +21,8 @@ gameRenderer = renderer.renderer()
 
 worldBlocks = []
 
-for x in range(10):
-    for z in range(10):
+for x in range(5):
+    for z in range(5):
         worldBlocks.append(block.block([x,0,z]))
 
 running = True
@@ -52,7 +52,7 @@ def sortBlocks(blocksArr):
         sortedBlocks.append(furthestBlock(blocksArr))
         blocksArr.remove(furthestBlock(blocksArr))
 
-    return sortedBlocks[::-1]
+    return sortedBlocks
 
 while running:
     if pygame.mouse.get_focused() and not escaped:
@@ -118,12 +118,46 @@ while running:
         newBlockX = int(round(gameCam.np_cPos[0]/40,2))
         newBlockY = int(round(gameCam.np_cPos[1]/40,2)) + 2
         newBlockZ = int(round(gameCam.np_cPos[2]/40,2))
-        newBlock = block.block([newBlockX,newBlockY,newBlockZ])
-        if newBlock not in worldBlocks:
+        newPosArr = [newBlockX, newBlockY, newBlockZ]
+        if newPosArr not in block.blockMap:
+            newBlock = block.block([newBlockX,newBlockY,newBlockZ])
             worldBlocks.append(newBlock)
     
     root.fill((144, 203, 245))
+    
+    renderedFaces = []
+    worldBlocks = sortBlocks(worldBlocks)
+    for worblock in worldBlocks:
+        distToCam = gameRenderer.posToCam(worblock.verticies[0], gameCam)
+        if distToCam[2] > 0 and (abs(distToCam[1]) < 500 and abs(distToCam[2]) < 500 and abs(distToCam[0]) < 500):
+            facePoints = gameRenderer.render(worblock, gameCam)
+            {k: v for k, v in sorted(facePoints.items(), key=lambda item: item[1])}
+            for face in facePoints:
+                faceNum = facePoints[face][1]
+                color = (255,255,255)
+                keyList = list(facePoints.keys())
+                try:
+                    if faceNum == 5:
+                        color = (20, 140, 54)
+                    elif faceNum == 4:
+                        color = (87, 29, 0)
 
+                    if faceNum == 0 or faceNum == 2:
+                        color = (140, 60, 20)
+                    
+                    elif faceNum == 1 or faceNum == 3:
+                        color = (105, 40, 8)
+                    
+                except:
+                    print("cant colour")
+                
+
+                face = facePoints[face][0]
+                for point in range(len(face)):
+                    face[point][0]+=width/2
+                    face[point][1]+=height/2
+                draw.polygon(root, color, face)
+    """
     renderedLines = []
     gameRenderer.skippedPixles = []
     worldBlocks = sortBlocks(worldBlocks)
@@ -148,7 +182,6 @@ while running:
                     )
                     renderedLines.append((pixel1,pixel2))
 
-        """
         for pixel in pixels:
             if pixel not in renderedPoints:
                 draw.circle(root, (0,0,0), (pixel[0]+width/2,pixel[1]+height/2), 4, 4)
@@ -161,7 +194,7 @@ while running:
         """ 
     
 
-    draw.circle(root, (255, 255, 255), (width/2, height/2), 3, 3)
+    draw.circle(root, (0, 0, 0), (width/2, height/2), 3, 3)
 
     if escaped:
         escapeSurf = pygame.Surface(size)
