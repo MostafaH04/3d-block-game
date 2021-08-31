@@ -7,7 +7,7 @@ from copy import deepcopy
 class renderer():
     def __init__(self):
         self.name = 'renderer'
-        self.skippedPixles = []
+        #self.skippedPixles = []
     
     def posToCam(self, vertexA, camera):
         camPos = camera.np_cPos
