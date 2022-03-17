@@ -1,5 +1,4 @@
 # "Block Game" *Name to be changed*
-The "Better" Minecraft (python)
 <br />
 # Goals <br/>
  - [x] Render a simple 3d plane using pygame
