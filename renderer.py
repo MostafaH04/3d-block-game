@@ -142,6 +142,6 @@ class renderer():
         try:
             del facePoints[furthest]
         except:
-            print("cant delete")
+            pass
         return facePoints
 

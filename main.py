@@ -7,6 +7,12 @@ from camera import camera
 import block
 import renderer
 from math import sin, cos, pi, trunc
+import asyncio
+import csv
+import os
+import mapGen, mapLoader
+
+mapDist = "./maps/"
 
 sensetivity = 0.06
 
@@ -18,12 +24,6 @@ clock = pygame.time.Clock()
 
 gameCam = camera(width, height, 70)
 gameRenderer = renderer.renderer()
-
-worldBlocks = []
-
-for x in range(5):
-    for z in range(5):
-        worldBlocks.append(block.block([x,0,z]))
 
 running = True
 escaped = False
@@ -53,6 +53,45 @@ def sortBlocks(blocksArr):
         blocksArr.remove(furthestBlock(blocksArr))
 
     return sortedBlocks
+
+
+async def renderBlocks(worldBlocks):
+    global gameCam
+    global gameRenderer
+    global root
+    for worblock in worldBlocks:
+        distToCam = gameRenderer.posToCam(worblock.verticies[0], gameCam)
+        #if distToCam[2] > 0 and (abs(distToCam[1]) < 500 and abs(distToCam[2]) < 500 and abs(distToCam[0]) < 500):
+        facePoints = gameRenderer.render(worblock, gameCam)
+        {k: v for k, v in sorted(facePoints.items(), key=lambda item: item[1])}
+        for face in facePoints:
+            faceNum = facePoints[face][1]
+            color = (255,255,255)
+            keyList = list(facePoints.keys())
+            try:
+                if faceNum == 5:
+                    color = (20, 140, 54)
+                elif faceNum == 4:
+                    color = (87, 29, 0)
+
+                if faceNum == 0 or faceNum == 2:
+                    color = (140, 60, 20)
+                
+                elif faceNum == 1 or faceNum == 3:
+                    color = (105, 40, 8)
+                
+            except:
+                print("cant colour")
+            
+
+            face = facePoints[face][0]
+            for point in range(len(face)):
+                face[point][0]+=width/2
+                face[point][1]+=height/2
+            draw.polygon(root, color, face)
+    
+    mapGen.storeBlocks(worldBlocks)
+    worldBlocks = None
 
 while running:
     if pygame.mouse.get_focused() and not escaped:
@@ -118,45 +157,17 @@ while running:
         newBlockX = int(round(gameCam.np_cPos[0]/40,2))
         newBlockY = int(round(gameCam.np_cPos[1]/40,2)) + 2
         newBlockZ = int(round(gameCam.np_cPos[2]/40,2))
-        newPosArr = [newBlockX, newBlockY, newBlockZ]
-        if newPosArr not in block.blockMap:
+        newsPosArr = [newBlockX, newBlockY, newBlockZ]
+        if [newBlockX, newBlockY, newBlockZ] not in block.blockMap:
             newBlock = block.block([newBlockX,newBlockY,newBlockZ])
-            worldBlocks.append(newBlock)
+            mapGen.addBlock(newBlock)
     
     root.fill((144, 203, 245))
     
     renderedFaces = []
+    worldBlocks = mapLoader.loadBlocks(gameCam)
     worldBlocks = sortBlocks(worldBlocks)
-    for worblock in worldBlocks:
-        distToCam = gameRenderer.posToCam(worblock.verticies[0], gameCam)
-        if distToCam[2] > 0 and (abs(distToCam[1]) < 500 and abs(distToCam[2]) < 500 and abs(distToCam[0]) < 500):
-            facePoints = gameRenderer.render(worblock, gameCam)
-            {k: v for k, v in sorted(facePoints.items(), key=lambda item: item[1])}
-            for face in facePoints:
-                faceNum = facePoints[face][1]
-                color = (255,255,255)
-                keyList = list(facePoints.keys())
-                try:
-                    if faceNum == 5:
-                        color = (20, 140, 54)
-                    elif faceNum == 4:
-                        color = (87, 29, 0)
-
-                    if faceNum == 0 or faceNum == 2:
-                        color = (140, 60, 20)
-                    
-                    elif faceNum == 1 or faceNum == 3:
-                        color = (105, 40, 8)
-                    
-                except:
-                    print("cant colour")
-                
-
-                face = facePoints[face][0]
-                for point in range(len(face)):
-                    face[point][0]+=width/2
-                    face[point][1]+=height/2
-                draw.polygon(root, color, face)
+    asyncio.run(renderBlocks(worldBlocks))
     """
     renderedLines = []
     gameRenderer.skippedPixles = []
