@@ -1,4 +1,5 @@
 # "Block Game" *Name to be changed*
+Minecraft budget ripoff
 <br />
 # Goals <br/>
  - [x] Render a simple 3d plane using pygame
