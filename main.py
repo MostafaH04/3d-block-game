@@ -226,4 +226,4 @@ while running:
     clock.tick(60)
     pygame.display.update()
 
-pygame.quite()
+pygame.quit()
