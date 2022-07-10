@@ -1,4 +1,4 @@
-# "Block Game" *Name to be changed*
+# PyBlock3D
 Minecraft budget ripoff
 <br />
 # Goals <br/>
